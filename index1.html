@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Select</title>
+</head>
+<body>
+    <h1>Speech Recognition for Eye Prescription</h1>
+
+    <label for="cylinderLeftEye">Cylinder Left Eye:</label>
+    <input type="text" id="cylinderLeftEye" readonly>
+    
+    <label for="cylinderRightEye">Cylinder Right Eye:</label>
+    <input type="text" id="cylinderRightEye" readonly>
+    
+    <label for="focusLeftEye">Focus Left Eye:</label>
+    <input type="text" id="focusLeftEye" readonly>
+    
+    <label for="focusRightEye">Focus Right Eye:</label>
+    <input type="text" id="focusRightEye" readonly>
+    
+    <button onclick="startTranscription()">Start Transcription</button>
+    <button onclick="stopTranscription()">Stop Transcription</button>
+    
+    <div style="position: fixed; bottom: 0; width: 100%; background-color: #f0f0f0; padding: 10px;">
+        <div>Transcription Status: <span id="transcriptionStatus">Not Started</span></div>
+        <textarea id="capturedText" rows="2" cols="50" readonly></textarea>
+    </div>
+    
+    <script>
+        let recognition;
+        let cylinderLeftEyeInput = document.getElementById('cylinderLeftEye');
+        let cylinderRightEyeInput = document.getElementById('cylinderRightEye');
+        let focusLeftEyeInput = document.getElementById('focusLeftEye');
+        let focusRightEyeInput = document.getElementById('focusRightEye');
+        let transcriptionStatus = document.getElementById('transcriptionStatus');
+        let capturedTextInput = document.getElementById('capturedText');
+    
+        function startTranscription() {
+            recognition = new window.webkitSpeechRecognition || window.SpeechRecognition();
+    
+            recognition.lang = 'en-US';
+            recognition.interimResults = true;
+            recognition.continuous = true;
+    
+            recognition.onstart = function() {
+                transcriptionStatus.innerText = 'Transcription Started';
+            };
+    
+            recognition.onresult = function(event) {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        transcript += event.results[i][0].transcript;
+                    }
+                }
+    
+                if (transcript.trim() !== '') {
+                    processSpeechInput(transcript);
+                    capturedTextInput.value = transcript;
+                }
+            };
+    
+            recognition.onspeechend = function() {
+                transcriptionStatus.innerText = 'Speech Ended';
+            };
+    
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+            };
+    
+            recognition.onend = function() {
+                transcriptionStatus.innerText = 'Transcription Ended';
+                capturedTextInput.value = ''; // Clear captured text
+            };
+    
+            recognition.start();
+        }
+    
+        function stopTranscription() {
+            if (recognition) {
+                recognition.stop();
+            }
+        }
+    
+        function processSpeechInput(transcript) {
+            const lowerTranscript = transcript.toLowerCase();
+    
+            if (lowerTranscript.includes('cylinder left eye')) {
+                const value = extractNumericValue(transcript);
+                cylinderLeftEyeInput.value = value;
+            } else if (lowerTranscript.includes('cylinder right eye')) {
+                const value = extractNumericValue(transcript);
+                cylinderRightEyeInput.value = value;
+            } else if (lowerTranscript.includes('focus left eye')) {
+                const value = extractNumericValue(transcript);
+                focusLeftEyeInput.value = value;
+            } else if (lowerTranscript.includes('focus right eye')) {
+                const value = extractNumericValue(transcript);
+                focusRightEyeInput.value = value;
+            }
+        }
+    
+        function extractNumericValue(text) {
+            const matches = text.match(/-?\d+\.?\d*/);
+            return matches ? matches[0] : '';
+        }
+    </script>
+
+</body>
+</html>

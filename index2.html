@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Native Browser API</title>
+</head>
+<body>
+    <h1>Speech Recognition</h1>
+
+<button onclick="startTranscription()">Start Transcription</button>
+<button onclick="stopTranscription()">Stop Transcription</button>
+
+<textarea id="transcriptionOutput" rows="4" cols="50"></textarea>
+
+<script>
+    let recognition;
+    let transcriptionOutput = document.getElementById('transcriptionOutput');
+
+    function startTranscription() {
+        recognition = new window.webkitSpeechRecognition || window.SpeechRecognition();
+
+        recognition.lang = 'en-US';
+        recognition.interimResults = true;
+        recognition.continuous = true;
+
+        recognition.onresult = function(event) {
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    transcript += event.results[i][0].transcript;
+                }
+            }
+
+            if (transcript.trim() !== '') {
+                transcriptionOutput.value += transcript + ' ';
+            }
+        };
+
+        recognition.onerror = function(event) {
+            console.error('Speech recognition error:', event.error);
+        };
+
+        recognition.onend = function() {
+            console.log('Speech recognition ended.');
+        };
+
+        recognition.start();
+    }
+
+    function stopTranscription() {
+        if (recognition) {
+            recognition.stop();
+        }
+    }
+</script>
+
+</body>
+</html>
