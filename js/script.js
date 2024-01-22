@@ -12,18 +12,17 @@ let listenStatus = false
 
 listentrigger.addEventListener('click',()=>{
     if(listenStatus){
-        listenStatus = false;
-        listentrigger.classList.add("w3-black")
-        listentrigger.innerText = "Start Listening"
-        listentrigger.classList.remove("w3-success");
+        // listenStatus = false;
+        // listentrigger.classList.add("w3-black")
+        // listentrigger.innerText = "Start Listening"
+        // listentrigger.classList.remove("w3-success");
         stopTranscription();
     }else{
         listenStatus = true;
         startTranscription();
         listentrigger.innerText = "Stop Listening"
         listentrigger.classList.remove("w3-black")
-        listentrigger.classList.add("w3-success");
-        
+        listentrigger.classList.add("w3-green");
     }
 })
 
@@ -47,8 +46,9 @@ function startTranscription() {
         }
 
         if (transcript.trim() !== '') {
+            capturedTextInput.innerText = transcript;
             processSpeechInput(transcript);
-            capturedTextInput.value = transcript;
+            
         }
     };
 
@@ -72,6 +72,11 @@ function stopTranscription() {
     if (recognition) {
         recognition.stop();
     }
+
+    listenStatus = false;
+    listentrigger.classList.add("w3-black")
+    listentrigger.innerText = "Start Listening"
+    listentrigger.classList.remove("w3-success");
 }
 
 // function fetchFieldByLabel(text){
