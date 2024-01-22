@@ -46,7 +46,7 @@ function startTranscription() {
         }
 
         if (transcript.trim() !== '') {
-            capturedTextInput.innerText = transcript;
+            capturedTextInput.value = transcript;
             processSpeechInput(transcript);
             
         }
